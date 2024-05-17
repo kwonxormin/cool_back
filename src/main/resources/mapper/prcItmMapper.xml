@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.prcItm.PrcItmMapper">
+    <!-- 매입처 관리 - 매입 품목 관리 -->
+	<select id="prcItmCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.prcItm_no)
+		FROM
+			tb_prcItm a, tb_prch b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.prch_no = b.prch_no
+			<if test="cmpn_no != 1">
+				AND
+				b.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'prch'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+	</select>
+
+	<select id="prcItmList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_prcItm a, tb_prch b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.prch_no = b.prch_no
+			<if test="cmpn_no != 1">
+				AND
+				b.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'prch'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+		<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.prcItm_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.prcItm_no ASC</if>
+		<if test="ob == 'prch_desc'">ORDER BY b.name DESC, a.prcItm_no DESC</if>
+		<if test="ob == 'prch_asc'">ORDER BY b.name ASC, a.prcItm_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="prcItmNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.prch_no prch_no
+		FROM
+			tb_prcItm a, tb_prch b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.prch_no = b.prch_no
+			AND
+			a.prcItm_no = #{prcItm_no}
+	</select>
+
+	<insert id="prcItmPost" parameterType="HashMap">
+		INSERT INTO tb_prcItm (name ,prch_no)
+		VALUES(
+			#{name}
+			,#{prch_no}
+		)
+	</insert>
+
+	<update id="prcItmPut" parameterType="HashMap">
+		UPDATE
+			tb_prcItm
+			<set>
+				name = #{name}
+				,prch_no = #{prch_no}
+			</set>
+		WHERE 
+			prcItm_no = #{prcItm_no}
+	</update>
+
+	<update id="prcItmDelete" parameterType="HashMap">
+		UPDATE
+			tb_prcItm
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			prcItm_no = #{prcItm_no}
+	</update>
+
+	<select id="prcItmOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prcItm
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			prch_no = #{prch_no}
+	</select>
+</mapper>

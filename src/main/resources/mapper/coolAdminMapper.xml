@@ -1,0 +1,2574 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.mapper.CoolAdminMapper">
+	
+	<select id="adminOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			id = #{id}
+	</select>
+
+	<insert id="adminJoin" parameterType="HashMap">
+		INSERT INTO tb_admin (id, pw, name, phone, note, is_delete)
+		VALUES(
+			#{id}
+			,#{pw}
+			,#{name}
+			,""
+			,"I"
+		)
+	</insert>
+
+	<update id="adminDelete" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<update id="tokenAdminPost" parameterType="HashMap">
+		UPDATE 
+			tb_admin
+			<set>
+				fcm_token = #{fcm_token}
+			</set>
+	  	WHERE 
+	  		admin_no = #{admin_no}
+	</update>
+
+	
+
+	
+
+	<select id="itemBomCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.item_bom_no item_bom_no, a.name bom_name, b.name info_name, c.name cate_name
+		FROM
+			tb_item_bom a, tb_item_info b, tb_item_cate c
+		WHERE
+		a.item_info_no = b.item_info_no 
+		AND
+		b.item_cate_no = c.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			c.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == 'all'">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			c.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			c.name like CONCAT('%',#{keyword},'%')
+		</if>
+  	</select>
+
+	<select id="itemBomList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.item_bom_no item_bom_no, a.name bom_name, b.name info_name, c.name cate_name
+		FROM
+			tb_item_bom a, tb_item_info b, tb_item_cate c
+		WHERE
+		a.item_info_no = b.item_info_no 
+		AND
+		b.item_cate_no = c.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			c.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == 'all'">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			c.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			c.name like CONCAT('%',#{keyword},'%')
+		</if>
+		ORDER BY
+		<if test="ob == 'bom_desc'">a.name DESC, a.item_bom_no DESC</if>
+	    <if test="ob == 'bom_asc'">a.name ASC, a.item_bom_no ASC</if>
+		<if test="ob == 'info_desc'">b.name DESC, a.item_bom_no DESC</if>
+	    <if test="ob == 'info_asc'">b.name ASC, a.item_bom_no ASC</if>
+		<if test="ob == 'cate_desc'">c.name DESC, a.item_bom_no DESC</if>
+	    <if test="ob == 'cate_asc'">c.name ASC, a.item_bom_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="itemBomNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.item_cate_no
+		FROM
+			tb_item_bom a, tb_item_info b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.item_info_no = b.item_info_no
+			AND
+			a.item_bom_no = #{item_bom_no}
+  	</select>
+
+	<insert id="itemBomPost" parameterType="HashMap">
+		INSERT INTO tb_item_bom (item_info_no,name)
+		VALUES(
+			#{item_info_no}
+			,#{name}
+		)
+	</insert>
+
+	<update id="itemBomPut" parameterType="HashMap">
+		UPDATE
+			tb_item_bom
+			<set>
+				item_info_no = #{item_info_no}
+				,name = #{name}
+			</set>
+	  	WHERE 
+	  		item_bom_no = #{item_bom_no}
+	</update>
+
+	<update id="itemBomDelete" parameterType="HashMap">
+		UPDATE
+			tb_item_bom
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		item_bom_no = #{item_bom_no}
+	</update>
+
+	<select id="itemBomOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item_bom
+		WHERE
+			is_delete = 'N'
+			AND
+			item_info_no = #{item_info_no}
+  	</select>
+
+	<select id="itemCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+			AND
+			name like CONCAT('%',#{keyword},'%')
+  	</select>
+
+	<select id="itemList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		ORDER BY
+		<if test="ob == 'name_desc'">name DESC, item_no DESC</if>
+	    <if test="ob == 'name_asc'">name ASC, item_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="itemNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+			AND
+			item_no = #{item_no}
+  	</select>
+
+	<insert id="itemPost" parameterType="HashMap">
+		INSERT INTO tb_item (name ,standard ,unit ,qntty ,note ,cmpn_no)
+		VALUES(
+			#{name}
+			,#{standard}
+			,#{unit}
+			,#{qntty}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="itemPut" parameterType="HashMap">
+		UPDATE
+			tb_item
+			<set>
+				name = #{name}
+				,standard = #{standard}
+				,unit = #{unit}
+				,qntty = #{qntty}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		item_no = #{item_no}
+	</update>
+
+	<update id="itemDelete" parameterType="HashMap">
+		UPDATE
+			tb_item
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		item_no = #{item_no}
+	</update>
+
+	<select id="itemOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="itemDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+			AND
+			cmpn_no = #{cmpn_no}
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		ORDER BY
+		<if test="ob == 'name_desc'">name DESC, item_no DESC</if>
+	    <if test="ob == 'name_asc'">name ASC, item_no ASC</if>
+  	</select>
+
+	<select id="splCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			is_spl = 'Y'
+			AND
+			head_cmpn_no = #{cmpn_no}
+		<if test="cate == 'all'">
+			AND
+			(name like CONCAT('%',#{keyword},'%')
+			OR
+			owner like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'name'">
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'owner'">
+			AND
+			owner like CONCAT('%',#{keyword},'%')
+		</if>
+  	</select>
+
+	<select id="splList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			is_spl = 'Y'
+			AND
+			head_cmpn_no = #{cmpn_no}
+		<if test="cate == 'all'">
+			AND
+			(name like CONCAT('%',#{keyword},'%')
+			OR
+			owner like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'name'">
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'owner'">
+			AND
+			owner like CONCAT('%',#{keyword},'%')
+		</if>
+		ORDER BY
+		<if test="ob == 'name_desc'">name DESC, cmpn_no DESC</if>
+	    <if test="ob == 'name_asc'">name ASC, cmpn_no ASC</if>
+		<if test="ob == 'owner_desc'">owner DESC, cmpn_no DESC</if>
+	    <if test="ob == 'owner_asc'">owner ASC, cmpn_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="splNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			cmpn_no = #{cmpn_no}
+  	</select>
+
+	<insert id="splPost" parameterType="HashMap" useGeneratedKeys="true" keyProperty="cmpn_no">
+		INSERT INTO tb_cmpn (name ,owner ,tel ,addr1 ,addr2 ,addr3 ,bizno ,note, head_cmpn_no, lat, lon)
+		VALUES(
+			#{name}
+			,#{owner}
+			,#{tel}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{bizno}
+			,#{note}
+			,#{cmpn_no}
+			,0
+			,0
+		)
+	</insert>
+
+	<update id="splPut" parameterType="HashMap">
+		UPDATE
+			tb_cmpn
+			<set>
+				name = #{name}
+				,owner = #{owner}
+				,tel = #{tel}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,addr3 = #{addr3}
+				,bizno = #{bizno}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		cmpn_no = #{cmpn_no}
+			AND
+			is_spl = 'Y'
+	</update>
+
+	<update id="splDelete" parameterType="HashMap">
+		UPDATE
+			tb_cmpn
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		cmpn_no = #{spl_no}
+			AND
+			is_spl = 'Y'
+	</update>
+
+	<select id="splOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			is_spl = 'Y'
+			AND
+			head_cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="splRepairCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cate == 'all'">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			b.is_spl = 'Y'
+  	</select>
+
+	<select id="splRepairList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cate == 'all'">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			b.is_spl = 'Y'
+		ORDER BY
+		<if test="ob == 'name_desc'">a.name DESC, a.repair_no DESC</if>
+	    <if test="ob == 'name_asc'">a.name ASC, a.repair_no ASC</if>
+		<if test="ob == 'cmpn_desc'">b.name DESC, a.repair_no DESC</if>
+	    <if test="ob == 'cmpn_asc'">b.name ASC, a.repair_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="splRepairNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.repair_no = #{repair_no}
+			AND
+			b.is_spl = 'Y'
+  	</select>
+
+	<insert id="splRepairPost" parameterType="HashMap">
+		INSERT INTO tb_repair (cmpn_no ,id ,pw ,name ,note)
+		VALUES(
+			#{spl_no}
+			,#{id}
+			,#{pw}
+			,#{name}
+			,#{note}
+		)
+	</insert>
+
+	<update id="splRepairPut" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				cmpn_no = #{spl_no}
+				,glasses_no = #{glasses_no}
+				,id = #{id}
+				,pw = #{pw}
+				,name = #{name}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<update id="splRepairDelete" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<select id="splRepairOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.id = #{id}
+			<!-- AND
+			(a.cmpn_no = #{cmpn_no}
+			OR
+			b.head_cmpn_no = #{cmpn_no}) -->
+  	</select>
+
+	<select id="splRepairSplList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			is_spl = 'Y'
+			AND
+			head_cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="splRepairDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cate == 'all'">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			b.is_spl = 'Y'
+		ORDER BY
+		<if test="ob == 'name_desc'">a.name DESC, a.repair_no DESC</if>
+	    <if test="ob == 'name_asc'">a.name ASC, a.repair_no ASC</if>
+		<if test="ob == 'cmpn_desc'">b.name DESC, a.repair_no DESC</if>
+	    <if test="ob == 'cmpn_asc'">b.name ASC, a.repair_no ASC</if>
+  	</select>
+
+	<select id="prchCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == 'all'">
+			AND
+			(name like CONCAT('%',#{keyword},'%')
+			OR
+			owner like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'name'">
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'owner'">
+			AND
+			owner like CONCAT('%',#{keyword},'%')
+		</if>
+  	</select>
+
+	<select id="prchList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == 'all'">
+			AND
+			(name like CONCAT('%',#{keyword},'%')
+			OR
+			owner like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'name'">
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'owner'">
+			AND
+			owner like CONCAT('%',#{keyword},'%')
+		</if>
+		ORDER BY
+		<if test="ob == 'name_desc'">name DESC, prch_no DESC</if>
+	    <if test="ob == 'name_asc'">name ASC, prch_no ASC</if>
+		<if test="ob == 'owner_desc'">owner DESC, prch_no DESC</if>
+	    <if test="ob == 'owner_asc'">owner ASC, prch_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="prchNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+			AND
+			prch_no = #{prch_no}
+  	</select>
+
+	<insert id="prchPost" parameterType="HashMap">
+		INSERT INTO tb_prch (name ,owner ,tel ,addr1 ,addr2 ,addr3 ,bizno ,note ,cmpn_no)
+		VALUES(
+			#{name}
+			,#{owner}
+			,#{tel}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{bizno}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="prchPut" parameterType="HashMap">
+		UPDATE
+			tb_prch
+			<set>
+				name = #{name}
+				,owner = #{owner}
+				,tel = #{tel}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,addr3 = #{addr3}
+				,bizno = #{bizno}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		prch_no = #{prch_no}
+	</update>
+
+	<update id="prchDelete" parameterType="HashMap">
+		UPDATE
+			tb_prch
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		prch_no = #{prch_no}
+	</update>
+
+	<select id="prchOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="prcItmCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_prcItm a, tb_prch b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.prch_no = b.prch_no
+			<if test="cmpn_no != 1">
+				AND
+				b.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'prch'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+  	</select>
+
+	<select id="prcItmList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_prcItm a, tb_prch b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.prch_no = b.prch_no
+			<if test="cmpn_no != 1">
+				AND
+				b.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'prch'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+		ORDER BY
+		<if test="ob == 'name_desc'">a.name DESC, a.prcItm_no DESC</if>
+	    <if test="ob == 'name_asc'">a.name ASC, a.prcItm_no ASC</if>
+		<if test="ob == 'prch_desc'">b.name DESC, a.prcItm_no DESC</if>
+	    <if test="ob == 'prch_asc'">b.name ASC, a.prcItm_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="prcItmNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.prch_no prch_no
+		FROM
+			tb_prcItm a, tb_prch b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.prch_no = b.prch_no
+			AND
+			a.prcItm_no = #{prcItm_no}
+  	</select>
+
+	<insert id="prcItmPost" parameterType="HashMap">
+		INSERT INTO tb_prcItm (name ,prch_no)
+		VALUES(
+			#{name}
+			,#{prch_no}
+		)
+	</insert>
+
+	<update id="prcItmPut" parameterType="HashMap">
+		UPDATE
+			tb_prcItm
+			<set>
+				name = #{name}
+				,prch_no = #{prch_no}
+			</set>
+	  	WHERE 
+	  		prcItm_no = #{prcItm_no}
+	</update>
+
+	<update id="prcItmDelete" parameterType="HashMap">
+		UPDATE
+			tb_prcItm
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		prcItm_no = #{prcItm_no}
+	</update>
+
+	<select id="prcItmOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prcItm
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			prch_no = #{prch_no}
+  	</select>
+
+	<select id="prcItmPrch" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+			<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+			</if>
+  	</select>
+
+	<select id="repairCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.repair_no, a.name, a.id, b.name AS cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				a.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.id like CONCAT('%',#{keyword},'%')
+				OR
+				a.id like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.id like CONCAT('%',#{keyword},'%')
+			</if>
+  	</select>
+
+	<select id="repairList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.repair_no, a.name, a.id, b.name AS cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				a.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.id like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.id like CONCAT('%',#{keyword},'%')
+			</if>
+		ORDER BY
+			<if test="ob == 'name_desc'">a.name DESC, a.repair_no DESC</if>
+	    	<if test="ob == 'name_asc'">a.name ASC, a.repair_no ASC</if>
+			<if test="ob == 'phone_desc'">a.id DESC, a.repair_no DESC</if>
+	    	<if test="ob == 'phone_asc'">a.id ASC, a.repair_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+
+	<select id="repairNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_repair
+		WHERE
+			is_delete = 'N'
+			AND
+			repair_no = #{repair_no}
+  	</select>
+	
+	<insert id="repairPost" parameterType="HashMap">
+		INSERT INTO tb_repair (cmpn_no ,id ,pw ,name ,note, is_glasses )
+		VALUES(
+			#{cmpn_no}
+			,#{id}
+			,#{pw}
+			,#{name}
+			,#{note}
+			,#{is_glasses}
+		)
+	</insert>
+
+	<update id="repairPut" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				cmpn_no = #{cmpn_no}
+				,is_glasses = #{is_glasses}
+				,id = #{id}
+				,pw = #{pw}
+				,name = #{name}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<update id="repairGlassesPut" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				glasses_no = #{glasses_no}
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<update id="repairDelete" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<select id="repairOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.id = #{id}
+			<!-- AND
+			(a.cmpn_no = #{cmpn_no}
+			OR
+			b.head_cmpn_no = #{cmpn_no}) -->
+  	</select>
+
+	<select id="repairName" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_repair
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{repair_name}
+			AND
+			cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="repairCmpn" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				head_cmpn_no = #{cmpn_no}
+			</if>
+  	</select>
+
+	<select id="repairDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.repair_no, a.name, a.id, b.name AS cmpn_name, a.pw, a.note
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				a.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.id like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.id like CONCAT('%',#{keyword},'%')
+			</if>
+		ORDER BY
+			<if test="ob == 'name_desc'">a.name DESC, a.repair_no DESC</if>
+	    	<if test="ob == 'name_asc'">a.name ASC, a.repair_no ASC</if>
+			<if test="ob == 'phone_desc'">a.id DESC, a.repair_no DESC</if>
+	    	<if test="ob == 'phone_asc'">a.id ASC, a.repair_no ASC</if>
+  	</select>
+
+	<select id="repairGlasses" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.glasses_no, a.name, a.repair_no
+		FROM
+			tb_glasses a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND 
+			b.head_cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="cusCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+  	</select>
+
+	<!-- <select id="cusCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				(c.cmpn_no = #{cmpn_no}
+				OR
+				c.head_cmpn_no = #{cmpn_no})
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		GROUP BY 
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2
+  	</select>
+
+	<select id="cusList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				(c.cmpn_no = #{cmpn_no}
+				OR
+				c.head_cmpn_no = #{cmpn_no})
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		GROUP BY 
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2
+		ORDER BY
+		<if test="ob == 'name_desc'">a.name DESC, a.cus_no DESC</if>
+	    <if test="ob == 'name_asc'">a.name ASC, a.cus_no ASC</if>
+		<if test="ob == 'phone_desc'">a.phone DESC, a.cus_no DESC</if>
+	    <if test="ob == 'phone_asc'">a.phone ASC, a.cus_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select> -->
+
+	<select id="cusList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		ORDER BY
+		<if test="ob == 'name_desc'">a.name DESC, a.cus_no DESC</if>
+	    <if test="ob == 'name_asc'">a.name ASC, a.cus_no ASC</if>
+		<if test="ob == 'phone_desc'">a.phone DESC, a.cus_no DESC</if>
+	    <if test="ob == 'phone_asc'">a.phone ASC, a.cus_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+
+	<select id="cusNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			is_delete = 'N'
+			AND
+			cus_no = #{cus_no}
+  	</select>
+
+	<select id="cusAsCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, b.status, c.name cmpn_name, b.addr1, b.addr2, b.phone as_phone, b.product , b.symptom, b.as_no
+		FROM
+			tb_customer a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND 
+			a.cus_no = #{cus_no}
+			<if test="cmpn_no != 1">
+				AND 
+				c.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+  	</select>
+
+	<select id="cusAsList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, b.status, c.name cmpn_name, a.addr1, a.addr2, a.addr3, b.phone as_phone, b.product , b.symptom, b.as_no
+		FROM
+			tb_customer a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND 
+			a.cus_no = #{cus_no}
+			<if test="cmpn_no != 1">
+				AND 
+				c.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		ORDER BY
+			b.cdate DESC, b.cus_no DESC
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<insert id="cusPost" parameterType="HashMap">
+		INSERT INTO tb_customer (name,phone,addr1,addr2,addr3,note,cmpn_no)
+		VALUES(
+			#{name}
+			,#{phone}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="cusPut" parameterType="HashMap">
+		UPDATE
+			tb_customer
+			<set>
+				name = #{name}
+				,phone = #{phone}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,addr3 = #{addr3}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		cus_no = #{cus_no}
+	</update>
+
+	<update id="cusDelete" parameterType="HashMap">
+		UPDATE
+			tb_customer
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		cus_no = #{cus_no}
+	</update>
+
+	<select id="cusOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			is_delete = 'N'
+			AND
+			phone = #{phone}
+  	</select>
+
+	<select id="cusDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		ORDER BY
+		<if test="ob == 'name_desc'">a.name DESC, a.cus_no DESC</if>
+	    <if test="ob == 'name_asc'">a.name ASC, a.cus_no ASC</if>
+		<if test="ob == 'phone_desc'">a.phone DESC, a.cus_no DESC</if>
+	    <if test="ob == 'phone_asc'">a.phone ASC, a.cus_no ASC</if>
+  	</select>
+
+	<select id="cusName" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{cus_name}
+  	</select>
+
+	<select id="asCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.as_no ,a.cdate ,a.status ,b.name cmpn_name ,a.addr1 ,a.addr2 ,a.phone ,a.product ,a.symptom, a.name cus_name, d.name repair_name, b.cmpn_no, a.date_s, a.date_e
+			,e.item_name
+		FROM
+			tb_as a, tb_cmpn b, tb_customer c, tb_repair d, tb_insItem e
+		WHERE
+			<!-- a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N' AND e.is_delete = 'N'
+			AND -->
+			a.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			AND
+			a.insItem_no = e.insItem_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr3 like CONCAT('%',#{keyword},'%')
+				OR
+				a.product like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'cus_name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr3 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'product'">
+				AND
+				a.product like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn_name'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'repair_name'">
+				AND
+				d.name like CONCAT('%',#{keyword},'%')
+			</if>
+  	</select>
+
+	<select id="asList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.as_no ,a.cdate ,a.status ,b.name cmpn_name ,a.addr1 ,a.addr2 ,a.phone ,a.product ,a.symptom, a.name cus_name, d.name repair_name, b.cmpn_no, a.date_s, a.date_e
+			,e.item_name
+		FROM
+			tb_as a, tb_cmpn b, tb_customer c, tb_repair d, tb_insItem e
+		WHERE
+			<!-- a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N' AND e.is_delete = 'N'
+			AND -->
+			a.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			AND
+			a.insItem_no = e.insItem_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr3 like CONCAT('%',#{keyword},'%')
+				OR
+				a.product like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'cus_name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr3 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'product'">
+				AND
+				a.product like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn_name'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'repair_name'">
+				AND
+				d.name like CONCAT('%',#{keyword},'%')
+			</if>
+		ORDER BY
+			<if test="ob == 'cdate_desc'">a.cdate DESC, a.cus_no DESC</if>
+			<if test="ob == 'cdate_asc'">a.cdate ASC, a.cus_no ASC</if>
+			<if test="ob == 'status_desc'">a.status DESC, a.cdate DESC</if>
+			<if test="ob == 'status_asc'">a.status ASC, a.cdate ASC</if>
+			<if test="ob == 'cus_name_desc'">a.name DESC, a.cdate DESC</if>
+			<if test="ob == 'cus_name_asc'">a.name ASC, a.cdate ASC</if>
+			<if test="ob == 'cmpn_name_desc'">b.name DESC, a.cdate DESC</if>
+			<if test="ob == 'cmpn_name_asc'">b.name ASC, a.cdate ASC</if>
+			<if test="ob == 'repair_name_desc'">d.name DESC, a.cdate DESC</if>
+			<if test="ob == 'repair_name_asc'">d.name ASC, a.cdate ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+
+	<select id="asNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			d.item_name, a.insItem_no, a.cdate, b.name, a.cus_no, a.addr1, a.addr2, a.addr3, b.phone, a.product ,a.symptom ,a.symptom_cus, a.img_cus, a.img_s, a.img_e, a.cmpn_no, a.repair_no, a.status, a.note, DATE_FORMAT(a.bdate,'%Y.%m.%d') bdate, a.bdate bdate2, CASE DAYOFWEEK(a.bdate)
+			WHEN '1' THEN '일'
+			WHEN '2' THEN '월'
+			WHEN '3' THEN '화'
+			WHEN '4' THEN '수'
+			WHEN '5' THEN '목'
+			WHEN '6' THEN '금'
+			WHEN '7' THEN '토'
+			END AS week, a.btime, b.fcm_token, c.name repair_name
+		FROM
+			tb_as a, tb_customer b, tb_repair c, tb_insItem d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			a.repair_no = c.repair_no
+			AND
+			a.insItem_no = d.insItem_no
+			AND
+			a.as_no = #{as_no}
+  	</select>
+
+	<insert id="asPost" parameterType="HashMap">
+		INSERT INTO tb_as (cus_no,addr1,addr2,addr3,phone,product,symptom_cus,symptom,cmpn_no,repair_no,status,note,bdate,btime,name,img_s,img_e,insItem_no)
+		VALUES(
+			#{cus_no}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{phone}
+			,#{product}
+			,#{symptom_cus}
+			,#{symptom}
+			,#{cmpn_no}
+			,#{repair_no}
+			,#{status}
+			,#{note}
+			,#{bdate}
+			,#{btime}
+			,#{name}
+			,#{img_s}
+			,#{img_e}
+			,#{insItem_no}
+		)
+	</insert>
+
+	<update id="asPut" parameterType="HashMap">
+		UPDATE
+			tb_as
+			<set>
+				status = #{status}
+				<if test='addr1!=""'>,addr1 = #{addr1}</if>
+				<if test='addr2!=""'>,addr2 = #{addr2}</if>
+				<if test='addr3!=""'>,addr3 = #{addr3}</if>
+				<if test='phone!=""'>,phone = #{phone}</if>
+				<if test='product!=""'>,product = #{product}</if>
+				<if test='symptom_cus!=""'>,symptom_cus = #{symptom_cus}</if>
+				<if test='symptom!=""'>,symptom = #{symptom}</if>
+				<if test='repair_no!=""'>,repair_no = #{repair_no}</if>
+				,note = #{note}
+				<if test='bdate!=""'>,bdate = #{bdate}</if>
+				<if test='btime!=""'>,btime = #{btime}</if>
+				<if test='name!=""'>,name = #{name}</if>
+				<if test='cmpn_no!=""'>,cmpn_no = #{cmpn_no}</if>
+				,img_s = #{img_s}
+				,img_e = #{img_e}
+				<if test='insItem_no!=""'>,insItem_no = #{insItem_no}</if>
+				<if test='cus_no!=""'>,cus_no = #{cus_no}</if>
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<update id="asDateS" parameterType="HashMap">
+		UPDATE
+			tb_as
+			<set>
+				date_s = NOW()
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<update id="asDateE" parameterType="HashMap">
+		UPDATE
+			tb_as
+			<set>
+				date_e = NOW(),
+				edate = NOW()
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<update id="asDelete" parameterType="HashMap">
+		UPDATE
+			tb_as
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+	
+	<select id="asDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.as_no ,a.cdate ,a.status ,b.name cmpn_name ,a.addr1 ,a.addr2 ,a.addr3 ,a.phone ,a.product ,a.symptom, a.name cus_name, d.name repair_name, b.cmpn_no, a.date_s, a.date_e
+			,e.item_name, a.bdate, a.btime, a.note
+		FROM
+			tb_as a, tb_cmpn b, tb_customer c, tb_repair d, tb_insItem e
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N' AND e.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			AND
+			a.insItem_no = e.insItem_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr3 like CONCAT('%',#{keyword},'%')
+				OR
+				a.product like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'cus_name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr3 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'product'">
+				AND
+				a.product like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn_name'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'repair_name'">
+				AND
+				d.name like CONCAT('%',#{keyword},'%')
+			</if>
+		ORDER BY
+			<if test="ob == 'cdate_desc'">a.cdate DESC, a.cus_no DESC</if>
+			<if test="ob == 'cdate_asc'">a.cdate ASC, a.cus_no ASC</if>
+			<if test="ob == 'status_desc'">a.status DESC, a.cdate DESC</if>
+			<if test="ob == 'status_asc'">a.status ASC, a.cdate ASC</if>
+			<if test="ob == 'cus_name_desc'">a.name DESC, a.cdate DESC</if>
+			<if test="ob == 'cus_name_asc'">a.name ASC, a.cdate ASC</if>
+			<if test="ob == 'cmpn_name_desc'">b.name DESC, a.cdate DESC</if>
+			<if test="ob == 'cmpn_name_asc'">b.name ASC, a.cdate ASC</if>
+			<if test="ob == 'repair_name_desc'">d.name DESC, a.cdate DESC</if>
+			<if test="ob == 'repair_name_asc'">d.name ASC, a.cdate ASC</if>
+  	</select>
+
+	<select id="asCusCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+  	</select>
+
+	<select id="asCusList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == 'all'">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+
+	<select id="asRepairList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="asCmpnList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			head_cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="asInsitemList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			b.*
+		FROM
+			tb_customer a, tb_insItem b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND
+			b.cus_no = #{cus_no}
+			AND
+			c.head_cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="glassesCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			b.name repair_name, b.id repair_phone 
+		FROM
+			tb_cmpn a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+			AND
+			is_glasses = 'Y'
+			<if test="cmpn_no != 1">
+				AND
+				a.head_cmpn_no = #{cmpn_no}
+			</if>
+  	</select>
+
+	<select id="glassesList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			b.name repair_name, b.id repair_phone, b.repair_no
+		FROM
+			tb_cmpn a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+			AND
+			is_glasses = 'Y'
+			<if test="cmpn_no != 1">
+				AND
+				a.head_cmpn_no = #{cmpn_no}
+			</if>
+		ORDER BY
+		<if test="ob == 'name_desc'">b.name DESC</if>
+	    <if test="ob == 'name_asc'">b.name ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+
+	<select id="glassesNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, DATE_FORMAT(a.edate,'%Y.%m.%d') e_date, b.name repair_name, b.repair_no repairNo
+		FROM
+			tb_glasses a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.glasses_no = b.glasses_no
+			AND
+			a.glasses_no = #{glasses_no}
+  	</select>
+
+	<update id="glassesPut" parameterType="HashMap">
+		UPDATE
+			tb_glasses
+			<set>
+				repair_no = #{repair_no}
+				,status = #{status}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		glasses_no = #{glasses_no}
+	</update>
+
+	<update id="glassesTokenPut" parameterType="HashMap">
+		UPDATE
+			tb_glasses
+			<set>
+				token = #{token}
+				,channelName = #{channelName}
+				,edate = NOW()
+			</set>
+	  	WHERE 
+	  		glasses_no = #{glasses_no}
+	</update>
+
+	<select id="glassesOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_glasses
+		WHERE
+			is_delete = 'N'
+			AND
+			repair_no = #{repair_no}
+  	</select>
+
+	<select id="userCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			is_admin = 'N'
+  	</select>
+
+	<select id="userList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			is_admin = 'N'
+		ORDER BY
+			name DESC
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="userNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+			AND
+			admin_no = #{admin_no}
+  	</select>
+
+	<insert id="userPost" parameterType="HashMap">
+		INSERT INTO tb_admin (name ,id ,pw ,phone ,note ,cmpn_no)
+		VALUES(
+			#{name}
+			,#{id}
+			,#{pw}
+			,#{phone}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="userPut" parameterType="HashMap">
+		UPDATE
+			tb_admin
+			<set>
+				name = #{name}
+				,id = #{id}
+				,pw = #{pw}
+				,phone = #{phone}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		admin_no = #{admin_no}
+	</update>
+
+	<update id="userDelete" parameterType="HashMap">
+		UPDATE
+			tb_admin
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		admin_no = #{admin_no}
+	</update>
+
+	<select id="userOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			id = #{id}
+		AND
+			is_admin = 'N'
+  	</select>
+
+	<select id="userAllList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		ORDER BY
+			name DESC
+  	</select>
+
+	<update id="userAcesPut" parameterType="HashMap">
+		UPDATE
+			tb_admin
+			<set>
+				aces = #{aces}
+			</set>
+	  	WHERE 
+	  		admin_no = #{admin_no}
+	</update>
+
+	<select id="insItemCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.insItem_no 
+			,a.cmpn_no
+			, a.repair_no
+			, a.cus_no 
+			, d.name repair_name
+			, a.cns_name 
+			, c.name cus_name
+			, a.item_name
+			, a.standard
+			, b.name cmpn_name
+			, a.addr
+			, a.note
+			, a.idate
+		FROM
+			tb_insItem a, tb_cmpn b, tb_customer c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			<if test="cmpn_no != 1">
+				AND
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+			<!-- <if test="cate == 'all'">
+				AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.repair_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'cus_name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'repair_name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cns_name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'name'">
+				AND
+				c.name like CONCAT('%',#{keyword},'%')
+			</if> -->
+  	</select>
+
+	<select id="insItemList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.insItem_no 
+			,a.cmpn_no
+			, a.repair_no
+			, a.cus_no 
+			, d.name repair_name
+			, a.cns_name 
+			, c.name cus_name
+			, a.item_name
+			, a.standard
+			, b.name cmpn_name
+			, a.addr
+			, a.note
+			, a.idate
+		FROM
+			tb_insItem a, tb_cmpn b, tb_customer c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			<if test="cmpn_no != 1">
+				AND
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+		ORDER BY
+		<if test="ob == 'no_desc'">a.insItem_no DESC</if>
+	    <if test="ob == 'no_asc'">a.insItem_no ASC</if>
+		<if test="ob == 'idate_desc'">a.idate DESC</if>
+	    <if test="ob == 'idate_asc'">a.idate ASC</if>
+		<if test="ob == 'name_desc'">c.name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'name_asc'">c.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cns_name_desc'">a.cns_name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'cns_name_asc'">a.cns_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'item_name_desc'">a.item_name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'item_name_asc'">a.item_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'standard_desc'">a.standard DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'standard_asc'">a.standard ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cmpn_name_desc'">b.name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'cmpn_name_asc'">b.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'repair_name_desc'">d.name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'repair_name_asc'">d.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'addr_desc'">a.addr DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'addr_asc'">a.addr ASC, a.insItem_no ASC</if>
+		<if test="ob == 'note_desc'">a.note DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'note_asc'">a.note ASC, a.insItem_no ASC</if>
+		LIMIT
+			${startIndex}, ${onepagelimit}
+  	</select>
+	
+	<select id="insItemNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.idate, b.name cus_name, a.cus_no, a.cns_name, a.item_name ,a.standard ,a.cmpn_no,
+			c.name cmpn_name, a.repair_no, d.name repair_name, a.addr, a.note, a.floorPlan, a.eqpmnList
+		FROM
+			tb_insItem a, tb_customer b, tb_cmpn c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no 
+			AND
+			a.cmpn_no = c.cmpn_no 
+			AND
+			a.repair_no = d.repair_no 
+			AND
+			a.insItem_no = #{insItem_no}
+  	</select>
+
+	<insert id="insItemPost" parameterType="HashMap">
+		INSERT INTO tb_insItem (cmpn_no ,repair_no ,cus_no ,cns_name ,item_name ,standard ,addr ,note ,idate, floorPlan, eqpmnList)
+		VALUES(
+			#{cmpn_no}
+			,#{repair_no}
+			,#{cus_no}
+			,#{cns_name}
+			,#{item_name}
+			,#{standard}
+			,#{addr}
+			,#{note}
+			,#{idate}
+			,#{floorPlan}
+			,#{eqpmnList}
+		)
+	</insert>
+
+	<update id="insItemPut" parameterType="HashMap">
+		UPDATE
+			tb_insItem
+			<set>
+				cmpn_no = #{cmpn_no}
+				,repair_no = #{repair_no}
+				,cus_no = #{cus_no}
+				,cns_name = #{cns_name}
+				,item_name = #{item_name}
+				,standard = #{standard}
+				,addr = #{addr}
+				,note = #{note}
+				,idate = #{idate}
+				,floorPlan = #{floorPlan}
+				,eqpmnList = #{eqpmnList}
+			</set>
+		WHERE 
+			insItem_no = #{insItem_no}
+	</update>
+
+	<update id="insItemDelete" parameterType="HashMap">
+		UPDATE
+			tb_insItem
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		insItem_no = #{insItem_no}
+	</update>
+
+	<select id="insItemOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_insItem
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="insItemDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.insItem_no 
+			,a.cmpn_no
+			, a.repair_no
+			, a.cus_no 
+			, d.name repair_name
+			, a.cns_name 
+			, c.name cus_name
+			, a.item_name
+			, a.standard
+			, b.name cmpn_name
+			, a.addr
+			, a.note
+			, a.idate
+		FROM
+			tb_insItem a, tb_cmpn b, tb_customer c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			<if test="cmpn_no != 1">
+				AND
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+		ORDER BY
+		<if test="ob == 'no_desc'">a.insItem_no DESC</if>
+	    <if test="ob == 'no_asc'">a.insItem_no ASC</if>
+		<if test="ob == 'idate_desc'">a.idate DESC</if>
+	    <if test="ob == 'idate_asc'">a.idate ASC</if>
+		<if test="ob == 'name_desc'">c.name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'name_asc'">c.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cns_name_desc'">a.cns_name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'cns_name_asc'">a.cns_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'item_name_desc'">a.item_name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'item_name_asc'">a.item_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'standard_desc'">a.standard DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'standard_asc'">a.standard ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cmpn_name_desc'">b.name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'cmpn_name_asc'">b.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'repair_name_desc'">d.name DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'repair_name_asc'">d.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'addr_desc'">a.addr DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'addr_asc'">a.addr ASC, a.insItem_no ASC</if>
+		<if test="ob == 'note_desc'">a.note DESC, a.insItem_no DESC</if>
+	    <if test="ob == 'note_asc'">a.note ASC, a.insItem_no ASC</if>
+	</select>
+
+	<select id="cmpnName" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{cmpn_name}
+	</select>
+
+	<select id="mtrMngPrch" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+			AND
+			cmpn_no = #{cmpn_no}
+	</select>
+
+	<insert id="mtrMng_save" parameterType="HashMap">
+		INSERT INTO tb_mtr_mng 
+			(
+				prch_no
+				,item_code
+				,item_name
+				,standard
+				,srttn
+				,qntty
+				,unit
+				,link
+				,mnfct
+				,brand
+				,model_name
+				,section
+				,wty_start
+				,wty_end
+				,note
+				,mngr
+				,prcsn_date
+			)
+		VALUES(
+			#{prch_no}
+			,#{item_code}
+			,#{item_name}
+			,#{standard}
+			,#{srttn}
+			,#{qntty}
+			,#{unit}
+			,#{link}
+			,#{mnfct}
+			,#{brand}
+			,#{model_name}
+			,#{section}
+			,#{wty_start}
+			,#{wty_end}
+			,#{note}
+			,#{mngr}
+			,#{prcsn_date}
+		)
+	</insert>
+
+	<select id="mtrMngCnt" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name
+		FROM
+			tb_mtr_mng a, tb_prch b
+		WHERE
+			a.prch_no = b.prch_no 
+		AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			b.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == 'all'">
+			AND
+			(b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="mtrMng" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name
+		FROM
+			tb_mtr_mng a, tb_prch b
+		WHERE
+			a.prch_no = b.prch_no 
+		AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			b.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == 'all'">
+			AND
+			(b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		ORDER BY
+			a.mtr_mng_no DESC
+		LIMIT
+			${startIndex}, ${onepagelimit}
+	</select>
+
+	<select id="mtrMng_findById" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_mtr_mng
+		WHERE
+			is_delete = 'N'
+			AND
+			mtr_mng_no = #{mtr_mng_no}
+	</select>
+
+	<update id="mtrMng_update" parameterType="HashMap">
+		UPDATE
+			tb_mtr_mng
+			<set>
+				prch_no = #{prch_no}
+				,item_code = #{item_code}
+				,item_name = #{item_name}
+				,standard = #{standard}
+				,srttn = #{srttn}
+				,qntty = #{qntty}
+				,unit = #{unit}
+				,link = #{link}
+				,mnfct = #{mnfct}
+				,brand = #{brand}
+				,model_name = #{model_name}
+				,section = #{section}
+				,wty_start = #{wty_start}
+				,wty_end = #{wty_end}
+				,note= #{note}
+				,mngr = #{mngr}
+				,prcsn_date = #{prcsn_date}
+			</set>
+		WHERE 
+			mtr_mng_no = #{mtr_mng_no}
+	</update>
+
+	<update id="mtrMng_delete" parameterType="HashMap">
+		UPDATE
+			tb_mtr_mng
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			mtr_mng_no = #{mtr_mng_no}
+	</update>
+</mapper>

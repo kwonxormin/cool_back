@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.mainHome.MainHomeMapper">
+    <!-- 메인 홈 -->
+    <select id="kpiAs" resultType="HashMap" parameterType="HashMap">
+		SELECT 
+			COUNT(a.as_no) cnt
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete ='N' AND b.is_delete ='N'
+		AND 
+			a.cmpn_no = b.cmpn_no
+		AND 
+			status = #{status}
+		AND 
+			b.head_cmpn_no = #{cmpn_no}
+		AND
+			a.cdate <![CDATA[>=]]> #{sDate}
+		AND
+			a.edate <![CDATA[<=]]> #{eDate}
+	</select>
+
+	<select id="kpiTime" resultType="HashMap" parameterType="HashMap">
+		SELECT 
+			TRUNCATE(AVG(TIMESTAMPDIFF(HOUR, a.date_s, a.date_e)),0) as_time
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete ='N' AND b.is_delete ='N'
+			AND 
+				a.cmpn_no = b.cmpn_no
+			AND
+				b.head_cmpn_no = #{cmpn_no}
+			AND
+				a.status = '6'
+			AND
+				a.cdate <![CDATA[>=]]> #{sDate}
+			AND
+				a.edate <![CDATA[<=]]> #{eDate}
+	</select>
+
+	<select id="kpiDate" resultType="HashMap" parameterType="HashMap">
+		SELECT 
+			TRUNCATE(AVG(DATEDIFF(a.edate,a.cdate)),0) as_date
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete ='N' AND b.is_delete ='N'
+			AND 
+				a.cmpn_no = b.cmpn_no
+			AND
+				b.head_cmpn_no = #{cmpn_no}
+			AND
+				a.status = '6'
+			AND
+				a.cdate <![CDATA[>=]]> #{sDate}
+			AND
+				a.edate <![CDATA[<=]]> #{eDate}
+	</select>
+
+	<select id="kpiDyear" resultType="HashMap" parameterType="HashMap">
+		SELECT 
+			SUM(IF(m = '01', cnt , 0)) AS 'm1',
+			SUM(IF(m = '02', cnt , 0)) AS 'm2',
+			SUM(IF(m = '03', cnt , 0)) AS 'm3',
+			SUM(IF(m = '04', cnt , 0)) AS 'm4',
+			SUM(IF(m = '05', cnt , 0)) AS 'm5',
+			SUM(IF(m = '06', cnt , 0)) AS 'm6',
+			SUM(IF(m = '07', cnt , 0)) AS 'm7',
+			SUM(IF(m = '08', cnt , 0)) AS 'm8',
+			SUM(IF(m = '09', cnt , 0)) AS 'm9',
+			SUM(IF(m = '10', cnt , 0)) AS 'm10',
+			SUM(IF(m = '11', cnt , 0)) AS 'm11',
+			SUM(IF(m = '12', cnt , 0)) AS 'm12'
+		FROM (
+			SELECT 
+				DATE_FORMAT(a.cdate,'%m') m, COUNT(*) cnt
+			FROM
+				tb_as a, tb_cmpn b
+			WHERE
+				a.is_delete ='N' AND b.is_delete ='N'
+				AND a.cmpn_no = b.cmpn_no
+				AND b.head_cmpn_no = #{cmpn_no}
+				AND a.status = 6
+				AND YEAR(a.cdate) = #{dyear}
+			GROUP BY m
+		) AS sub
+	</select>
+</mapper>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>스마트 공방</title>
+<link rel="shortcut icon" href="img/shortIcon.png">
+  <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.21.1/video.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.9.1/video.min.js"></script>
+  <script src="https://unpkg.com/browse/@videojs/http-streaming@2.6.0/dist/videojs-http-streaming.min.js"></script>
+</head>
+<body>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    #my_video {
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      border: 1px solid silver;
+      overflow: hidden;
+    }
+  </style>
+
+  <video id="my_video" class="video-js vjs-default-skin" controls preload="metadata" width="800" height="450" data-setup='{}' style="width: 100%;" muted="muted">
+    <source id="video_source" src="https://rtmp.adminez.co.kr/hls/g51.m3u8" type="application/vnd.apple.mpegurl">
+  </video>
+
+  <script src="https://unpkg.com/video.js/dist/video.js"></script>
+  <script src="https://unpkg.com/videojs-flash/dist/videojs-flash.js"></script>
+  <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.cusApp.CusAppMapper">
+    <!-- 고객 앱 -->
+	<select id="insItemNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cus_name, b.addr1, b.addr2, b.addr3, b.phone
+		FROM
+			tb_insItem a, tb_customer b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			a.insItem_no = #{insItem_no}
+	</select>
+	
+	<select id="cusAppAsList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			DATE_FORMAT(a.cdate,'%y.%m.%d') cdate,
+			d.item_name product,
+			DATE_FORMAT(a.bdate,'%y.%m.%d') bdate,
+			a.btime,
+			c.name r_name,
+			c.id r_tel,
+			a.as_no,
+			a.status
+		FROM
+			tb_as a, tb_customer b, tb_repair c, tb_insItem d
+		WHERE
+			a.cus_no = b.cus_no
+			AND
+			a.repair_no  = c.repair_no 
+			AND
+			a.insItem_no = d.insItem_no 
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			b.cus_no = #{cus_no}
+		ORDER BY
+			as_no DESC
+	</select>
+
+	<update id="asPutStatus" parameterType="HashMap">
+		UPDATE
+			tb_as
+			<set>
+				status = #{status}
+			</set>
+		WHERE 
+			as_no = #{as_no}
+	</update>
+</mapper>

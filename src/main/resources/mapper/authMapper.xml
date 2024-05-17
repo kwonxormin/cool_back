@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.auth.AuthMapper">
+    <!-- 로그인 -->
+    <select id="loginAdmin" parameterType="com.cool.dto.LoginDto$request" resultType="com.cool.dto.LoginDto$adminResponse">
+        SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+			AND
+			id = #{id}
+			AND
+			pw = #{pw}
+    </select>
+
+	<select id="loginCus" parameterType="com.cool.dto.LoginDto$request" resultType="com.cool.dto.LoginDto$cusResponse">
+        SELECT
+			a.*, b.tel cmpn_phone, b.name cmpn_name, b.lat cmpn_lat , b.lon cmpn_lon
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no 
+			AND
+			a.phone = #{phone}
+    </select>
+
+	<select id="loginRepair" parameterType="com.cool.dto.LoginDto$request" resultType="com.cool.dto.LoginDto$repairResponse">
+        SELECT
+			a.repair_no, a.id, a.name, a.cmpn_no, b.name AS cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.id = #{id}
+			AND
+			a.pw = #{pw}
+    </select>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.adminApp.AdminAppMapper">
+    <!-- 관리자 앱 -->
+	<select id="asList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.as_no ,DATE_FORMAT(a.cdate,'%y.%m.%d') cdate ,a.status ,b.name cmpn_name ,a.addr1 ,a.addr2 ,a.phone , e.item_name product ,a.symptom, a.name cus_name, d.name repair_name, b.cmpn_no, a.note
+		FROM
+			tb_as a, tb_cmpn b, tb_customer c, tb_repair d, tb_insItem e
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N' AND e.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			AND
+			a.insItem_no = e.insItem_no
+			AND
+			a.status = '1' 
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+		ORDER BY
+			a.as_no DESC
+	</select>
+	
+</mapper>

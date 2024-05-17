@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.itemInfo.ItemInfoMapper">
+    <!-- 품목정보 - 품목정보 -->
+	<select id="itemInfoItemCate" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			item_cate_no, name
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			AND
+			cmpn_no = #{cmpn_no}
+	</select>
+	
+	<select id="itemInfoCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.item_info_no)
+		FROM
+			tb_item_info a, tb_item_cate b
+		WHERE
+		a.item_cate_no = b.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="itemInfoList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.item_info_no, a.name info_name , b.name cate_name
+		FROM
+			tb_item_info a, tb_item_cate b
+		WHERE
+		a.item_cate_no = b.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="ob == 'info_desc'">ORDER BY a.name DESC, a.item_info_no DESC</if>
+		<if test="ob == 'info_asc'">ORDER BY a.name ASC, a.item_info_no ASC</if>
+		<if test="ob == 'cate_desc'">ORDER BY b.name DESC, a.item_info_no DESC</if>
+		<if test="ob == 'cate_asc'">ORDER BY b.name ASC, a.item_info_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="itemInfoNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item_info
+		WHERE
+			is_delete = 'N'
+			AND
+			item_info_no = #{item_info_no}
+	</select>
+
+	<select id="itemInfoOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item_info
+		WHERE
+			is_delete = 'N'
+			AND
+			item_cate_no = #{item_cate_no}
+			AND
+			name = #{info_name}
+	</select>
+
+	<insert id="itemInfoPost" parameterType="HashMap">
+		INSERT INTO tb_item_info (item_cate_no,name)
+		VALUES(
+			#{item_cate_no}
+			,#{info_name}
+		)
+	</insert>
+
+	<update id="itemInfoPut" parameterType="HashMap">
+		UPDATE
+			tb_item_info
+			<set>
+				item_cate_no = #{item_cate_no}
+				,name = #{info_name}
+			</set>
+		WHERE 
+			item_info_no = #{item_info_no}
+	</update>
+
+	<update id="itemInfoDelete" parameterType="HashMap">
+		UPDATE
+			tb_item_info
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			item_info_no = #{item_info_no}
+	</update>
+</mapper>

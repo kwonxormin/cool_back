@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.insItem.InsItemMapper">
+    <!-- 고객관리 - 설치 제품 정보 -->
+	<select id="insItemCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.insItem_no)
+		FROM
+			tb_insItem a, tb_cmpn b, tb_customer c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			<if test="cmpn_no != 1">
+				AND
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+	</select>
+
+	<select id="insItemList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.insItem_no 
+			,a.cmpn_no
+			, a.repair_no
+			, a.cus_no 
+			, d.name repair_name
+			, a.cns_name 
+			, c.name cus_name
+			, a.item_name
+			, a.standard
+			, b.name cmpn_name
+			, a.addr
+			, a.note
+			, a.idate
+		FROM
+			tb_insItem a, tb_cmpn b, tb_customer c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			<if test="cmpn_no != 1">
+				AND
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+		ORDER BY
+		<if test="ob == 'no_desc'">a.insItem_no DESC</if>
+		<if test="ob == 'no_asc'">a.insItem_no ASC</if>
+		<if test="ob == 'idate_desc'">a.idate DESC</if>
+		<if test="ob == 'idate_asc'">a.idate ASC</if>
+		<if test="ob == 'name_desc'">c.name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'name_asc'">c.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cns_name_desc'">a.cns_name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'cns_name_asc'">a.cns_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'item_name_desc'">a.item_name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'item_name_asc'">a.item_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'standard_desc'">a.standard DESC, a.insItem_no DESC</if>
+		<if test="ob == 'standard_asc'">a.standard ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cmpn_name_desc'">b.name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'cmpn_name_asc'">b.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'repair_name_desc'">d.name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'repair_name_asc'">d.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'addr_desc'">a.addr DESC, a.insItem_no DESC</if>
+		<if test="ob == 'addr_asc'">a.addr ASC, a.insItem_no ASC</if>
+		<if test="ob == 'note_desc'">a.note DESC, a.insItem_no DESC</if>
+		<if test="ob == 'note_asc'">a.note ASC, a.insItem_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="insItemNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.idate, b.name cus_name, a.cus_no, a.cns_name, a.item_name ,a.standard ,a.cmpn_no,
+			c.name cmpn_name, a.repair_no, d.name repair_name, a.addr, a.note, a.floorPlan, a.eqpmnList
+		FROM
+			tb_insItem a, tb_customer b, tb_cmpn c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no 
+			AND
+			a.cmpn_no = c.cmpn_no 
+			AND
+			a.repair_no = d.repair_no 
+			AND
+			a.insItem_no = #{insItem_no}
+	</select>
+
+	<insert id="insItemPost" parameterType="HashMap">
+		INSERT INTO tb_insItem (cmpn_no ,repair_no ,cus_no ,cns_name ,item_name ,standard ,addr ,note ,idate, floorPlan, eqpmnList)
+		VALUES(
+			#{cmpn_no}
+			,#{repair_no}
+			,#{cus_no}
+			,#{cns_name}
+			,#{item_name}
+			,#{standard}
+			,#{addr}
+			,#{note}
+			,#{idate}
+			,#{floorPlan}
+			,#{eqpmnList}
+		)
+	</insert>
+
+	<update id="insItemPut" parameterType="HashMap">
+		UPDATE
+			tb_insItem
+			<set>
+				cmpn_no = #{cmpn_no}
+				,repair_no = #{repair_no}
+				,cus_no = #{cus_no}
+				,cns_name = #{cns_name}
+				,item_name = #{item_name}
+				,standard = #{standard}
+				,addr = #{addr}
+				,note = #{note}
+				,idate = #{idate}
+				,floorPlan = #{floorPlan}
+				,eqpmnList = #{eqpmnList}
+			</set>
+		WHERE 
+			insItem_no = #{insItem_no}
+	</update>
+
+	<update id="insItemDelete" parameterType="HashMap">
+		UPDATE
+			tb_insItem
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			insItem_no = #{insItem_no}
+	</update>
+
+	<select id="insItemDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.insItem_no 
+			,a.cmpn_no
+			, a.repair_no
+			, a.cus_no 
+			, d.name repair_name
+			, a.cns_name 
+			, c.name cus_name
+			, a.item_name
+			, a.standard
+			, b.name cmpn_name
+			, a.addr
+			, a.note
+			, a.idate
+		FROM
+			tb_insItem a, tb_cmpn b, tb_customer c, tb_repair d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			<if test="cmpn_no != 1">
+				AND
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				(c.name  like CONCAT('%',#{keyword},'%')
+				OR
+				a.cns_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.item_name like CONCAT('%',#{keyword},'%')
+				OR
+				a.standard like CONCAT('%',#{keyword},'%')
+				OR
+				b.name like CONCAT('%',#{keyword},'%')
+				OR
+				d.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr like CONCAT('%',#{keyword},'%')
+				OR
+				a.note like CONCAT('%',#{keyword},'%'))
+		ORDER BY
+		<if test="ob == 'no_desc'">a.insItem_no DESC</if>
+		<if test="ob == 'no_asc'">a.insItem_no ASC</if>
+		<if test="ob == 'idate_desc'">a.idate DESC</if>
+		<if test="ob == 'idate_asc'">a.idate ASC</if>
+		<if test="ob == 'name_desc'">c.name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'name_asc'">c.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cns_name_desc'">a.cns_name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'cns_name_asc'">a.cns_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'item_name_desc'">a.item_name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'item_name_asc'">a.item_name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'standard_desc'">a.standard DESC, a.insItem_no DESC</if>
+		<if test="ob == 'standard_asc'">a.standard ASC, a.insItem_no ASC</if>
+		<if test="ob == 'cmpn_name_desc'">b.name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'cmpn_name_asc'">b.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'repair_name_desc'">d.name DESC, a.insItem_no DESC</if>
+		<if test="ob == 'repair_name_asc'">d.name ASC, a.insItem_no ASC</if>
+		<if test="ob == 'addr_desc'">a.addr DESC, a.insItem_no DESC</if>
+		<if test="ob == 'addr_asc'">a.addr ASC, a.insItem_no ASC</if>
+		<if test="ob == 'note_desc'">a.note DESC, a.insItem_no DESC</if>
+		<if test="ob == 'note_asc'">a.note ASC, a.insItem_no ASC</if>
+	</select>
+
+	<select id="insItemCmpn" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				head_cmpn_no = #{cmpn_no}
+			</if>
+	</select>
+
+	<select id="insItemRepair" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.cmpn_no = #{cmpn_no}
+	</select>
+</mapper>

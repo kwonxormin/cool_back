@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.prch.PrchMapper">
+    <!-- 매입처 관리 - 매입처 관리 -->
+	<select id="prchCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(*)
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(name like CONCAT('%',#{keyword},'%')
+			OR
+			owner like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'name'">
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'owner'">
+			AND
+			owner like CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="prchList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(name like CONCAT('%',#{keyword},'%')
+			OR
+			owner like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'name'">
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'owner'">
+			AND
+			owner like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="ob == 'name_desc'">ORDER BY name DESC, prch_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY name ASC, prch_no ASC</if>
+		<if test="ob == 'owner_desc'">ORDER BY owner DESC, prch_no DESC</if>
+		<if test="ob == 'owner_asc'">ORDER BY owner ASC, prch_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="prchNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+			AND
+			prch_no = #{prch_no}
+	</select>
+
+	<insert id="prchPost" parameterType="HashMap">
+		INSERT INTO tb_prch (name ,owner ,tel ,addr1 ,addr2 ,addr3 ,bizno ,note ,cmpn_no)
+		VALUES(
+			#{name}
+			,#{owner}
+			,#{tel}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{bizno}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="prchPut" parameterType="HashMap">
+		UPDATE
+			tb_prch
+			<set>
+				name = #{name}
+				,owner = #{owner}
+				,tel = #{tel}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,addr3 = #{addr3}
+				,bizno = #{bizno}
+				,note = #{note}
+			</set>
+		WHERE 
+			prch_no = #{prch_no}
+	</update>
+
+	<update id="prchDelete" parameterType="HashMap">
+		UPDATE
+			tb_prch
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			prch_no = #{prch_no}
+	</update>
+
+	<select id="prchOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_prch
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			cmpn_no = #{cmpn_no}
+	</select>
+</mapper>

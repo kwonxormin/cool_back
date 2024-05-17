@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.item.ItemMapper">
+    <!-- 품목정보 - 품목기준정보 -->
+	<select id="itemCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(*)
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			name like CONCAT('%',#{keyword},'%')
+	</select>
+
+	<select id="itemList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+			AND
+			name like CONCAT('%',#{keyword},'%')
+		<if test="ob == 'name_desc'">ORDER BY name DESC, item_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY name ASC, item_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="itemNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+			AND
+			item_no = #{item_no}
+	</select>
+
+	<select id="itemCateNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			name
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			AND
+			item_cate_no = #{item_cate_no}
+	</select>
+
+	<insert id="itemCatePost" parameterType="HashMap">
+		INSERT INTO tb_item_cate (name,cmpn_no)
+		VALUES(
+			#{name}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<select id="itemOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			cmpn_no = #{cmpn_no}
+	</select>
+
+	<insert id="itemPost" parameterType="HashMap">
+		INSERT INTO tb_item (name ,standard ,unit ,qntty ,note ,cmpn_no)
+		VALUES(
+			#{name}
+			,#{standard}
+			,#{unit}
+			,#{qntty}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="itemPut" parameterType="HashMap">
+		UPDATE
+			tb_item
+			<set>
+				name = #{name}
+				,standard = #{standard}
+				,unit = #{unit}
+				,qntty = #{qntty}
+				,note = #{note}
+			</set>
+		WHERE 
+			item_no = #{item_no}
+	</update>
+
+	<update id="itemDelete" parameterType="HashMap">
+		UPDATE
+			tb_item
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			item_no = #{item_no}
+	</update>
+</mapper>

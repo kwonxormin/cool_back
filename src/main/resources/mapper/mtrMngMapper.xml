@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.mtrMng.MtrMngMapper">
+    <!-- 자재 관리 - 자재 관리 -->
+	<select id="mtrMngCnt" resultType="int" parameterType="hashMap">
+		SELECT
+			COUNT(a.mtr_mng_no)
+		FROM
+			tb_mtr_mng a, tb_prch b
+		WHERE
+			a.prch_no = b.prch_no 
+		AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			b.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="mtrMngList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*, b.name
+		FROM
+			tb_mtr_mng a, tb_prch b
+		WHERE
+			a.prch_no = b.prch_no 
+		AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			b.cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			a.item_name like CONCAT('%',#{keyword},'%')
+		<!-- <if test="cate == ''">
+			AND
+			(b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if> -->
+		ORDER BY
+			a.mtr_mng_no DESC
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+
+	<select id="mtrMngNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_mtr_mng
+		WHERE
+			is_delete = 'N'
+			AND
+			mtr_mng_no = #{mtr_mng_no}
+	</select>
+
+	<insert id="mtrMngPost" parameterType="HashMap">
+		INSERT INTO tb_mtr_mng 
+			(
+				prch_no
+				,item_code
+				,item_name
+				,standard
+				,srttn
+				,qntty
+				,unit
+				,link
+				,mnfct
+				,brand
+				,model_name
+				,section
+				,wty_start
+				,wty_end
+				,note
+				,mngr
+				,prcsn_date
+			)
+		VALUES(
+			#{prch_no}
+			,#{item_code}
+			,#{item_name}
+			,#{standard}
+			,#{srttn}
+			,#{qntty}
+			,#{unit}
+			,#{link}
+			,#{mnfct}
+			,#{brand}
+			,#{model_name}
+			,#{section}
+			,#{wty_start}
+			,#{wty_end}
+			,#{note}
+			,#{mngr}
+			,#{prcsn_date}
+		)
+	</insert>
+
+	<update id="mtrMngPut" parameterType="HashMap">
+		UPDATE
+			tb_mtr_mng
+			<set>
+				prch_no = #{prch_no}
+				,item_code = #{item_code}
+				,item_name = #{item_name}
+				,standard = #{standard}
+				,srttn = #{srttn}
+				,qntty = #{qntty}
+				,unit = #{unit}
+				,link = #{link}
+				,mnfct = #{mnfct}
+				,brand = #{brand}
+				,model_name = #{model_name}
+				,section = #{section}
+				,wty_start = #{wty_start}
+				,wty_end = #{wty_end}
+				,note= #{note}
+				,mngr = #{mngr}
+				,prcsn_date = #{prcsn_date}
+			</set>
+		WHERE 
+			mtr_mng_no = #{mtr_mng_no}
+	</update>
+
+	<update id="mtrMngDelete" parameterType="HashMap">
+		UPDATE
+			tb_mtr_mng
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			mtr_mng_no = #{mtr_mng_no}
+	</update>
+</mapper>

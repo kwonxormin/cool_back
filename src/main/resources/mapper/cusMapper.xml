@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.cus.CusMapper">
+    <!-- 고객관리 - 고객정보관리 -->
+	<select id="cusCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.cus_no)
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+	</select>
+
+	<select id="cusList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.cus_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.cus_no ASC</if>
+		<if test="ob == 'phone_desc'">ORDER BY a.phone DESC, a.cus_no DESC</if>
+		<if test="ob == 'phone_asc'">ORDER BY a.phone ASC, a.cus_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="cusNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			is_delete = 'N'
+			AND
+			cus_no = #{cus_no}
+	</select>
+
+	<select id="cusAsCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.cus_no)
+		FROM
+			tb_customer a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND 
+			a.cus_no = #{cus_no}
+			<if test="cmpn_no != 1">
+				AND 
+				c.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+	</select>
+
+	<select id="cusAsList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, b.status, c.name cmpn_name, a.addr1, a.addr2, a.addr3, b.phone as_phone, b.product , b.symptom, b.as_no
+		FROM
+			tb_customer a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND 
+			a.cus_no = #{cus_no}
+			<if test="cmpn_no != 1">
+				AND 
+				c.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		ORDER BY
+			b.cdate DESC, b.cus_no DESC
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+
+	<select id="cusOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			is_delete = 'N'
+			AND
+			phone = #{phone}
+	</select>
+
+	<insert id="cusPost" parameterType="HashMap">
+		INSERT INTO tb_customer (name,phone,addr1,addr2,addr3,note,cmpn_no)
+		VALUES(
+			#{name}
+			,#{phone}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="cusPut" parameterType="HashMap">
+		UPDATE
+			tb_customer
+			<set>
+				name = #{name}
+				,phone = #{phone}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,addr3 = #{addr3}
+				,note = #{note}
+			</set>
+		WHERE 
+			cus_no = #{cus_no}
+	</update>
+
+	<update id="cusDelete" parameterType="HashMap">
+		UPDATE
+			tb_customer
+			<set>
+				is_delete = 'Y',
+				phone = CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'), CONCAT('_', phone))
+			</set>
+		WHERE 
+			cus_no = #{cus_no}
+	</update>
+
+	<select id="cusDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.cus_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.cus_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.cus_no ASC</if>
+		<if test="ob == 'phone_desc'">ORDER BY a.phone DESC, a.cus_no DESC</if>
+		<if test="ob == 'phone_asc'">ORDER BY a.phone ASC, a.cus_no ASC</if>
+	</select>
+
+	<select id="cusName" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{cus_name}
+	</select>
+</mapper>

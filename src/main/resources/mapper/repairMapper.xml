@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.repair.RepairMapper">
+    <!-- A/S기사관리 - A/S기사관리 -->
+	<select id="repairCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.repair_no)
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				a.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.id like CONCAT('%',#{keyword},'%')
+				OR
+				a.id like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.id like CONCAT('%',#{keyword},'%')
+			</if>
+	</select>
+
+	<select id="repairList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.repair_no, a.name, a.id, b.name AS cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				a.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.id like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.id like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.repair_no DESC</if>
+			<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.repair_no ASC</if>
+			<if test="ob == 'phone_desc'">ORDER BY a.id DESC, a.repair_no DESC</if>
+			<if test="ob == 'phone_asc'">ORDER BY a.id ASC, a.repair_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+
+	<select id="repairNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_repair
+		WHERE
+			is_delete = 'N'
+			AND
+			repair_no = #{repair_no}
+	</select>
+	
+	<select id="repairOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_repair a
+		WHERE
+			a.is_delete = 'N'
+			AND
+			a.id = #{id}
+	</select>
+
+	<insert id="repairPost" parameterType="HashMap">
+		INSERT INTO tb_repair (cmpn_no ,id <if test="pw != ''">,pw</if> ,name ,note, is_glasses )
+		VALUES(
+			#{cmpn_no}
+			,#{id}
+			<if test="pw != ''">,#{pw}</if>
+			,#{name}
+			,#{note}
+			,#{is_glasses}
+		)
+	</insert>
+
+	<update id="repairPut" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				cmpn_no = #{cmpn_no}
+				<if test="glasses_no != ''">,glasses_no = #{glasses_no}</if>
+				,is_glasses = #{is_glasses}
+				,id = #{id}
+				<if test="pw != ''">,pw = #{pw}</if>
+				,name = #{name}
+				,note = #{note}
+			</set>
+		WHERE 
+			repair_no = #{repair_no}
+	</update>
+
+	<update id="repairDelete" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			repair_no = #{repair_no}
+	</update>
+
+	<select id="repairName" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_repair
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{repair_name}
+			AND
+			cmpn_no = #{cmpn_no}
+	</select>
+
+	<select id="repairDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.repair_no, a.name, a.id, b.name AS cmpn_name, a.pw, a.note
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				a.cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.id like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.id like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.repair_no DESC</if>
+			<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.repair_no ASC</if>
+			<if test="ob == 'phone_desc'">ORDER BY a.id DESC, a.repair_no DESC</if>
+			<if test="ob == 'phone_asc'">ORDER BY a.id ASC, a.repair_no ASC</if>
+	</select>
+</mapper>

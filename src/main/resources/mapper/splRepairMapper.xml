@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.splRepair.SplRepairMapper">
+    <!-- 협력업체관리 - 협력업체기사관리 -->
+	<select id="splRepairCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.repair_no)
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			b.is_spl = 'Y'
+	</select>
+
+	<select id="splRepairList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			b.is_spl = 'Y'
+		<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.repair_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.repair_no ASC</if>
+		<if test="ob == 'cmpn_desc'">ORDER BY b.name DESC, a.repair_no DESC</if>
+		<if test="ob == 'cmpn_asc'">ORDER BY b.name ASC, a.repair_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="splRepairNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.repair_no = #{repair_no}
+			AND
+			b.is_spl = 'Y'
+	</select>
+
+	<select id="splRepairOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_repair a
+		WHERE
+			a.is_delete = 'N'
+			AND
+			a.id = #{id}
+	</select>
+
+	<insert id="splRepairPost" parameterType="HashMap">
+		INSERT INTO tb_repair (cmpn_no ,id <if test="pw != ''">,pw</if> ,name ,note)
+		VALUES(
+			#{spl_no}
+			,#{id}
+			<if test="pw != ''">,#{pw}</if>
+			,#{name}
+			,#{note}
+		)
+	</insert>
+
+	<update id="splRepairPut" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				cmpn_no = #{spl_no}
+				<if test="glasses_no != ''">,glasses_no = #{glasses_no}</if>
+				,id = #{id}
+				<if test="pw != ''">,pw = #{pw}</if>
+				,name = #{name}
+				,note = #{note}
+			</set>
+		WHERE 
+			repair_no = #{repair_no}
+	</update>
+
+	<update id="splRepairDelete" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			repair_no = #{repair_no}
+	</update>
+
+	<select id="splRepairDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, b.name cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'cmpn'">
+				AND
+				b.name like CONCAT('%',#{keyword},'%')
+			</if>
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			b.is_spl = 'Y'
+		<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.repair_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.repair_no ASC</if>
+		<if test="ob == 'cmpn_desc'">ORDER BY b.name DESC, a.repair_no DESC</if>
+		<if test="ob == 'cmpn_asc'">ORDER BY b.name ASC, a.repair_no ASC</if>
+	</select>
+</mapper>

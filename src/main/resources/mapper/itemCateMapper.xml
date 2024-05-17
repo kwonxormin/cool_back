@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.itemCate.ItemCateMapper">
+    <!-- 품목정보 - 품목분류 -->
+	<select id="itemCateCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(*)
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				cmpn_no = #{cmpn_no}
+			</if>
+			AND
+				name like CONCAT('%',#{keyword},'%')
+	</select>
+
+	<select id="itemCateList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			item_cate_no, name
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				cmpn_no = #{cmpn_no}
+			</if>
+			AND 
+				name like CONCAT('%',#{keyword},'%')
+		ORDER BY
+			item_cate_no DESC
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="itemCateNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			name
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			AND
+			item_cate_no = #{item_cate_no}
+	</select>
+
+	<insert id="itemCatePost" parameterType="HashMap">
+		INSERT INTO tb_item_cate (name,cmpn_no)
+		VALUES(
+			#{name}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="itemCatePut" parameterType="HashMap">
+		UPDATE
+			tb_item_cate
+			<set>
+				name = #{name}
+			</set>
+		WHERE 
+			item_cate_no = #{item_cate_no}
+	</update>
+
+	<update id="itemCateDelete" parameterType="HashMap">
+		UPDATE
+			tb_item_cate
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			item_cate_no = #{item_cate_no}
+	</update>
+
+	<select id="itemCateOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{name}
+			AND
+			cmpn_no = #{cmpn_no}
+	</select>
+</mapper>

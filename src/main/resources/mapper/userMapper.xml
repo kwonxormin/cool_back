@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.user.UserMapper">
+    <!-- 사용자 관리 - 사용자 등록 -->
+	<select id="userCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(*)
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			is_admin = 'N'
+	</select>
+
+	<select id="userList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			cmpn_no = #{cmpn_no}
+		</if>
+		AND
+			is_admin = 'N'
+		ORDER BY
+			name DESC
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="userNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+			AND
+			is_admin = 'N'
+			AND
+			admin_no = #{admin_no}
+	</select>
+
+	<insert id="userPost" parameterType="HashMap"  useGeneratedKeys="true" keyProperty="admin_no">
+		INSERT INTO tb_admin (name ,id ,pw ,phone ,note ,cmpn_no)
+		VALUES(
+			#{name}
+			,#{id}
+			,#{pw}
+			,#{phone}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<insert id="userAcesPost" parameterType="HashMap">
+		INSERT INTO tb_admin_to_aces (admin_no, aces_no)
+			VALUES
+			(#{admin_no},#{aces_no})
+	</insert>
+
+	<update id="userPut" parameterType="HashMap">
+		UPDATE
+			tb_admin
+			<set>
+				name = #{name}
+				,id = #{id}
+				,pw = #{pw}
+				,phone = #{phone}
+				,note = #{note}
+			</set>
+		WHERE 
+			admin_no = #{admin_no}
+	</update>
+
+	<update id="userDelete" parameterType="HashMap">
+		UPDATE
+			tb_admin
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			admin_no = #{admin_no}
+	</update>
+
+	<select id="userOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+		AND
+			(
+				phone = #{phone}
+			OR
+				id = #{id}
+			)
+	</select>
+
+	<select id="userAcesNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			aecs_no
+		FROM
+			tb_admin_to_aces
+		WHERE
+			admin_no = #{admin_no}
+	</select>
+
+	<delete id="userAcesDelete" parameterType="HashMap">
+		DELETE FROM
+			tb_admin_to_aces
+		WHERE 
+			admin_no = #{admin_no}
+	</delete>
+</mapper>

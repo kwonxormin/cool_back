@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.glasses.GlassesMapper">
+    <!-- 스마트글라스 - 사용자 호출 -->
+	<select id="glassesCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.cmpn_no)
+		FROM
+			tb_cmpn a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+			AND
+			is_glasses = 'Y'
+			<if test="cmpn_no != 1">
+				AND
+				a.head_cmpn_no = #{cmpn_no}
+			</if>
+	</select>
+
+	<select id="glassesList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			b.name repair_name, b.id repair_phone, b.repair_no
+		FROM
+			tb_cmpn a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+			AND
+			is_glasses = 'Y'
+			<if test="cmpn_no != 1">
+				AND
+				a.head_cmpn_no = #{cmpn_no}
+			</if>
+		<if test="ob == 'name_desc'">ORDER BY b.name DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY b.name ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="glassesNo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.*, DATE_FORMAT(a.edate,'%Y.%m.%d') e_date, b.name repair_name, b.repair_no repairNo
+		FROM
+			tb_glasses a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.glasses_no = b.glasses_no
+			AND
+			a.glasses_no = #{glasses_no}
+	</select>
+
+	<update id="glassesTokenPut" parameterType="HashMap">
+		UPDATE
+			tb_glasses
+			<set>
+				token = #{token}
+				,channelName = #{channelName}
+				,edate = NOW()
+			</set>
+		WHERE 
+			glasses_no = #{glasses_no}
+	</update>
+
+
+
+
+
+	<select id="glassesAsCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.glasses_no)
+		FROM
+			tb_glasses a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.glasses_no = b.glasses_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND 
+			a.glasses_no = #{glasses_no}
+			<if test="cmpn_no != 1">
+				AND 
+				c.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+	</select>
+
+	<select id="glassesAsList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.glasses_no, a.name, a.phone, b.status, c.name cmpn_name, a.addr1, a.addr2, a.addr3, b.phone as_phone, b.product , b.symptom, b.as_no
+		FROM
+			tb_glasses a, tb_as b, tb_cmpn c
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+			AND
+			a.glasses_no = b.glasses_no
+			AND
+			b.cmpn_no = c.cmpn_no
+			AND 
+			a.glasses_no = #{glasses_no}
+			<if test="cmpn_no != 1">
+				AND 
+				c.head_cmpn_no = #{cmpn_no}
+			</if>
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		ORDER BY
+			b.cdate DESC, b.glasses_no DESC
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+
+	<select id="glassesOL" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_glasses
+		WHERE
+			is_delete = 'N'
+			AND
+			phone = #{phone}
+	</select>
+
+	<insert id="glassesPost" parameterType="HashMap">
+		INSERT INTO tb_glasses (name,phone,addr1,addr2,addr3,note,cmpn_no)
+		VALUES(
+			#{name}
+			,#{phone}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{note}
+			,#{cmpn_no}
+		)
+	</insert>
+
+	<update id="glassesPut" parameterType="HashMap">
+		UPDATE
+			tb_glasses
+			<set>
+				name = #{name}
+				,phone = #{phone}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,addr3 = #{addr3}
+				,note = #{note}
+			</set>
+		WHERE 
+			glasses_no = #{glasses_no}
+	</update>
+
+	<update id="glassesDelete" parameterType="HashMap">
+		UPDATE
+			tb_glasses
+			<set>
+				is_delete = 'Y'
+			</set>
+		WHERE 
+			glasses_no = #{glasses_no}
+	</update>
+
+	<select id="glassesDownload" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.glasses_no, a.name, a.phone, a.addr1, a.addr2, a.addr3
+		FROM
+			tb_glasses a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			<if test="cmpn_no != 1">
+				AND 
+				b.head_cmpn_no = #{cmpn_no}
+			</if>
+			<if test="cate == ''">
+				AND
+				(a.name like CONCAT('%',#{keyword},'%')
+				OR
+				a.phone like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="cate == 'name'">
+				AND
+				a.name like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'phone'">
+				AND
+				a.phone like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="cate == 'addr'">
+				AND
+				(a.addr1 like CONCAT('%',#{keyword},'%')
+				OR
+				a.addr2 like CONCAT('%',#{keyword},'%'))
+			</if>
+		<if test="ob == 'name_desc'">ORDER BY a.name DESC, a.glasses_no DESC</if>
+		<if test="ob == 'name_asc'">ORDER BY a.name ASC, a.glasses_no ASC</if>
+		<if test="ob == 'phone_desc'">ORDER BY a.phone DESC, a.glasses_no DESC</if>
+		<if test="ob == 'phone_asc'">ORDER BY a.phone ASC, a.glasses_no ASC</if>
+	</select>
+
+	<select id="glassesName" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			*
+		FROM
+			tb_glasses
+		WHERE
+			is_delete = 'N'
+			AND
+			name = #{glasses_name}
+	</select>
+</mapper>

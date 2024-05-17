@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cool.admin.itemBom.ItemBomMapper">
+    <!-- 품목정보 - BOM관리 -->
+	<select id="itemBomItemInfo" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			item_info_name info_name, item_info_no
+		FROM
+			tb_item_info
+		WHERE
+			is_delete = 'N'
+			AND
+			item_info_no = #{item_info_no}
+	</select>
+
+	<select id="itemBomCnt" resultType="int" parameterType="HashMap">
+		SELECT
+			COUNT(a.item_bom_no)
+		FROM
+			tb_item_bom a, tb_item_info b, tb_item_cate c
+		WHERE
+		a.item_info_no = b.item_info_no 
+		AND
+		b.item_cate_no = c.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			c.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			c.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			c.name like CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="itemBomList" resultType="HashMap" parameterType="HashMap">
+		SELECT
+			a.item_bom_no item_bom_no, a.name bom_name, b.name info_name, c.name cate_name
+		FROM
+			tb_item_bom a, tb_item_info b, tb_item_cate c
+		WHERE
+		a.item_info_no = b.item_info_no 
+		AND
+		b.item_cate_no = c.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			c.cmpn_no = #{cmpn_no}
+		</if>
+		<if test="cate == ''">
+			AND
+			(a.name like CONCAT('%',#{keyword},'%')
+			OR
+			b.name like CONCAT('%',#{keyword},'%')
+			OR
+			c.name like CONCAT('%',#{keyword},'%'))
+		</if>
+		<if test="cate == 'bom'">
+			AND
+			a.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'info'">
+			AND
+			b.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="cate == 'cate'">
+			AND
+			c.name like CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="ob == 'bom_desc'">ORDER BY a.name DESC, a.item_bom_no DESC</if>
+		<if test="ob == 'bom_asc'">ORDER BY a.name ASC, a.item_bom_no ASC</if>
+		<if test="ob == 'info_desc'">ORDER BY .name DESC, a.item_bom_no DESC</if>
+		<if test="ob == 'info_asc'">ORDER BY b.name ASC, a.item_bom_no ASC</if>
+		<if test="ob == 'cate_desc'">ORDER BY c.name DESC, a.item_bom_no DESC</if>
+		<if test="ob == 'cate_asc'">ORDER BY c.name ASC, a.item_bom_no ASC</if>
+		<include refid="mapper.common-Mapper.paging"/>
+	</select>
+	
+	<select id="itemBomNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*, b.item_cate_no
+		FROM
+			tb_item_bom a, tb_item_info b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.item_info_no = b.item_info_no
+			AND
+			a.item_bom_no = #{item_bom_no}
+	</select>
+
+	<select id="itemBomOL" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_item_bom
+		WHERE
+			is_delete = 'N'
+			AND
+			item_info_no = #{item_info_no}
+			AND
+			name = #{name}
+	</select>
+
+	<insert id="itemBomPost" parameterType="HashMap">
+		INSERT INTO tb_item_bom (item_info_no,name)
+		VALUES(
+			#{item_info_no}
+			,#{name}
+		)
+	</insert>
+
+	<update id="itemBomPut" parameterType="HashMap">
+		UPDATE
+			tb_item_bom
+			<set>
+				item_info_no = #{item_info_no}
+				,name = #{name}
+			</set>
+	  	WHERE 
+	  		item_bom_no = #{item_bom_no}
+	</update>
+
+	<update id="itemBomDelete" parameterType="HashMap">
+		UPDATE
+			tb_item_bom
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		item_bom_no = #{item_bom_no}
+	</update>
+</mapper>

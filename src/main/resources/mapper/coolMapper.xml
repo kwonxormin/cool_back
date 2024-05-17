@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.cool.mapper.CoolMapper">
+	<select id="cusLogin" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*, b.tel cmpn_phone, b.name cmpn_name, b.lat cmpn_lat , b.lon cmpn_lon
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no 
+			AND
+			a.phone = #{phone}
+  	</select>
+
+	<select id="cusLoginCheck" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*, b.tel cmpn_phone, b.name cmpn_name, b.lat cmpn_lat , b.lon cmpn_lon
+		FROM
+			tb_customer a, tb_cmpn b
+		WHERE
+			a.is_delete = 'I'
+			AND
+			a.cmpn_no = b.cmpn_no 
+			AND
+			a.phone = #{phone}
+  	</select>
+
+	<insert id="cusJoin" parameterType="HashMap">
+		INSERT INTO tb_customer (name,phone,addr1,addr2,addr3,note,cmpn_no,is_delete)
+		VALUES(
+			#{name}
+			,#{phone}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{note}
+			,1
+			,'I'
+		)
+	</insert>
+
+	<select id="cusToken" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			token = #{token}
+			AND
+			is_delete = 'N'
+  	</select>
+
+	<insert id="cusPost" parameterType="HashMap">
+		INSERT INTO tb_customer (name, token ,phone ,addr1 ,addr2 ,note )
+		VALUES(
+			#{name}
+			,#{token}
+			,#{phone}
+			,#{addr1}
+			,#{addr2}
+			,#{note}
+		)
+	</insert>
+
+	<update id="cusPut" parameterType="HashMap">
+		UPDATE 
+			tb_customer
+			<set>
+				name = #{name}
+				,phone = #{phone}
+				,addr1 = #{addr1}
+				,addr2 = #{addr2}
+				,note = #{note}
+			</set>
+	  	WHERE 
+	  		token = #{token}
+	</update>
+
+	<update id="cusDelete" parameterType="HashMap">
+		UPDATE
+			tb_customer
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		cus_no = #{cus_no}
+	</update>
+
+	<select id="cusOL" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_customer
+		WHERE
+			phone = #{phone}
+  	</select>
+
+	<select id="asList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			c.name r_name, c.id r_tel,
+			a.as_no, a.note, a.addr1, a.addr2, a.addr3, a.symptom_cus, a.img_cus,
+			a.name, a.symptom, a.phone, DATE_FORMAT(a.cdate,'%y.%m.%d') cdate, a.status
+			, DATE_FORMAT(a.bdate,'%y.%m.%d') bdate, a.btime, d.item_name product
+		FROM
+			tb_as a, tb_customer b, tb_repair c, tb_insItem d
+		WHERE
+			a.cus_no = b.cus_no
+			AND
+			a.repair_no  = c.repair_no 
+			AND
+			a.insItem_no = d.insItem_no 
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			b.cus_no = #{cus_no}
+		ORDER BY
+			as_no DESC
+  	</select>
+
+	<insert id="asPost" parameterType="HashMap">
+		INSERT INTO tb_as (insItem_no, cus_no ,name ,addr1 ,addr2, addr3, cmpn_no ,phone, note, symptom, symptom_cus, img_cus)
+		VALUES(
+			#{insItem_no}
+			,#{cus_no}
+			,#{name}
+			,#{addr1}
+			,#{addr2}
+			,#{addr3}
+			,#{cmpn_no}
+			,#{phone}
+			,""
+			,""
+			,#{symptom_cus}
+			,#{img_cus}
+		)
+	</insert>
+
+	<update id="asPut" parameterType="asDto">
+		UPDATE 
+			tb_as
+			<set>
+				status = #{status}
+				<if test='cmpn_no!=""'>,cmpn_no = #{cmpn_no}</if>
+				<if test='bdate!=""'>,bdate = #{bdate}</if>
+				<if test='btime!=""'>,btime = #{btime}</if>
+				<if test='repair_no!=""'>,repair_no = #{repair_no}</if>
+				<if test='symptom!=""'>,symptom = #{symptom}</if>
+				<if test='note!=""'>,note = #{note}</if>
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<update id="asPutStatus" parameterType="asDto">
+		UPDATE 
+			tb_as
+			<set>
+				status = #{status}
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<update id="sImgPut" parameterType="HashMap">
+		UPDATE 
+			tb_as
+			<set>
+				img_s = #{img_s}
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<update id="eImgPut" parameterType="HashMap">
+		UPDATE 
+			tb_as
+			<set>
+				img_e = #{img_e}
+			</set>
+	  	WHERE 
+	  		as_no = #{as_no}
+	</update>
+
+	<select id="asListRepair" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.as_no, a.note, a.product, a.addr1, a.addr2, a.repair_no,a.symptom_cus, a.img_cus,
+			a.name, a.symptom, a.phone, DATE_FORMAT(a.cdate,'%y.%m.%d') cdate, a.status, DATE_FORMAT(a.bdate,'%y.%m.%d') bdate, a.btime
+		FROM
+			tb_as a, tb_repair b
+		WHERE
+			a.repair_no = b.repair_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			b.repair_no = #{repair_no}
+			<if test="status != ''">
+				AND
+				a.status = #{status}
+			</if>
+		ORDER BY
+			a.cdate DESC
+  	</select>
+
+	<select id="cmpnList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*
+		FROM
+			tb_cmpn a, tb_as b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cmpn_no <![CDATA[>]]> 1
+			AND
+			a.is_spl = 'N'
+			AND
+			b.cus_no = #{cus_no}
+		GROUP BY
+			a.cmpn_no
+		ORDER BY
+			a.cmpn_no
+  	</select>
+
+	<select id="asNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.status,
+			a.note,
+			a.img_s,
+			a.img_e,
+			a.img_cus,
+			d.item_name,
+			a.symptom,
+			a.symptom_cus,
+			c.name repair_name,
+			b.addr1, b.addr2, b.addr3
+		FROM
+			tb_as a, tb_customer b, tb_repair c, tb_insItem d
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			a.repair_no = c.repair_no
+			AND
+			a.insItem_no = d.insItem_no
+			AND
+			a.as_no = #{as_no}
+  	</select>
+
+	<select id="cmpnNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_cmpn
+		WHERE
+			is_delete = 'N'
+			AND
+			cmpn_no = #{cmpn_no}
+  	</select>
+
+	<select id="repairLogin" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.repair_no, a.id, a.name, a.cmpn_no, b.name AS cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.id = #{id}
+			AND
+			a.pw = #{pw}
+  	</select>
+
+	<select id="repairLoginCheck" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.repair_no, a.id, a.name, a.cmpn_no, b.name AS cmpn_name
+		FROM
+			tb_repair a, tb_cmpn b
+		WHERE
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.is_delete = 'I'
+			AND
+			a.id = #{id}
+			AND
+			a.pw = #{pw}
+  	</select>
+
+	<select id="repairOL" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_repair
+		WHERE
+			id = #{id}
+  	</select>
+
+	<insert id="repairJoin" parameterType="HashMap">
+		INSERT INTO tb_repair (id, pw, name, note, is_delete)
+		VALUES(
+			#{id}
+			,#{pw}
+			,#{name}
+			,""
+			,"I"
+		)
+	</insert>
+
+	<update id="repairDelete" parameterType="HashMap">
+		UPDATE
+			tb_repair
+			<set>
+				is_delete = 'Y'
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+	
+	<select id="itemCateList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			name, item_cate_no
+		FROM
+			tb_item_cate
+		WHERE
+			is_delete = 'N'
+			<if test="cmpn_no != 1">
+				AND
+				cmpn_no = #{cmpn_no}
+			</if>
+		ORDER BY
+			item_cate_no DESC
+  	</select>
+
+	<select id="itemInfoList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			name, item_info_no
+		FROM
+			tb_item_info
+		WHERE
+			is_delete = 'N'
+			AND
+			item_cate_no = #{item_cate_no}
+		ORDER BY
+			item_info_no DESC
+  	</select>
+
+	<select id="itemBomList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.item_bom_no item_bom_no, a.name bom_name, b.name info_name, c.name cate_name
+		FROM
+			tb_item_bom a, tb_item_info b, tb_item_cate c
+		WHERE
+		a.item_info_no = b.item_info_no 
+		AND
+		b.item_cate_no = c.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+		<if test="cmpn_no != 1">
+			AND
+			c.cmpn_no = #{cmpn_no}
+		</if>
+		ORDER BY
+			a.item_bom_no DESC
+  	</select>
+
+	<select id="itemBomNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.item_bom_no item_bom_no, a.name bom_name, b.name info_name, c.name cate_name
+		FROM
+			tb_item_bom a, tb_item_info b, tb_item_cate c
+		WHERE
+		a.item_info_no = b.item_info_no 
+		AND
+		b.item_cate_no = c.item_cate_no
+		AND 
+		a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N'
+		AND
+		item_bom_no = #{item_bom_no}
+  	</select>
+
+	<update id="tokenRepairPost" parameterType="HashMap">
+		UPDATE 
+			tb_repair
+			<set>
+				fcm_token = #{fcm_token}
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<update id="tokenCusPost" parameterType="HashMap">
+		UPDATE 
+			tb_customer
+			<set>
+				token = #{token}
+				,fcm_token = #{fcm_token}
+			</set>
+	  	WHERE 
+	  		phone = #{phone}
+	</update>
+
+	<update id="glassesPut" parameterType="HashMap">
+		UPDATE
+			tb_glasses
+			<set>
+				status = #{status}
+			</set>
+	  	WHERE 
+	  		repair_no = #{repair_no}
+	</update>
+
+	<select id="glassesRepair" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_glasses
+		WHERE
+			is_delete = 'N'
+			AND
+			repair_no = #{repair_no}
+  	</select>
+
+	<select id="glassesNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*, DATE_FORMAT(a.edate,'%Y.%m.%d') e_date
+		FROM
+			tb_glasses a, tb_repair b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.glasses_no = b.glasses_no
+			AND
+			b.repair_no = #{repair_no}
+  	</select>
+
+	<select id="asAdminList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.as_no ,DATE_FORMAT(a.cdate,'%y.%m.%d') cdate ,a.status ,b.name cmpn_name ,a.addr1 ,a.addr2 ,a.phone , e.item_name product ,a.symptom, a.name cus_name, d.name repair_name, b.cmpn_no, a.note
+		FROM
+			tb_as a, tb_cmpn b, tb_customer c, tb_repair d, tb_insItem e
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N' AND c.is_delete = 'N' AND d.is_delete = 'N' AND e.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			a.cus_no = c.cus_no
+			AND
+			a.repair_no = d.repair_no
+			AND
+			a.insItem_no = e.insItem_no
+			AND
+			a.status = '1' 
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+		ORDER BY
+			a.as_no DESC
+  	</select>
+
+	<select id="adminNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_admin
+		WHERE
+			is_delete = 'N'
+			AND
+			cmpn_no in (select head_cmpn_no from tb_cmpn where cmpn_no = #{cmpn_no})
+  	</select>
+
+	<select id="insItemList" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			*
+		FROM
+			tb_insItem
+		WHERE
+			is_delete = 'N'
+			AND
+			cus_no = #{cus_no}
+  	</select>
+
+	<select id="insItemNo" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*, b.name cus_name, b.addr1, b.addr2, b.addr3, b.phone
+		FROM
+			tb_insItem a, tb_customer b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cus_no = b.cus_no
+			AND
+			a.insItem_no = #{insItem_no}
+  	</select>
+
+	<select id="kpi3_date" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*,b.name, DATEDIFF(a.edate,a.cdate) as_date
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			DATE(a.edate) = DATE(NOW())
+			AND
+			a.status = 6
+  	</select>
+
+	<select id="kpi3_time" resultType="HashMap" parameterType="hashMap">
+		SELECT
+			a.*,b.name, TIMESTAMPDIFF(HOUR, a.date_s, a.date_e) as_time
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete = 'N' AND b.is_delete = 'N'
+			AND
+			a.cmpn_no = b.cmpn_no
+			AND
+			b.head_cmpn_no = #{cmpn_no}
+			AND
+			DATE(a.edate) = DATE(NOW())
+			AND
+			a.status = 6
+  	</select>
+
+	<select id="kpi2_date" resultType="HashMap" parameterType="hashMap">
+		SELECT 
+			TRUNCATE(AVG(DATEDIFF(a.edate,a.cdate)),0) as_date
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete ='N' AND b.is_delete ='N'
+			AND 
+				a.cmpn_no = b.cmpn_no
+			AND
+				b.head_cmpn_no = #{cmpn_no}
+			AND
+				a.status = '6'
+			AND
+				MONTH(a.cdate) = MONTH(NOW())-1
+			AND
+				MONTH(a.edate) = MONTH(NOW())-1
+  	</select>
+
+	<select id="kpi2_time" resultType="HashMap" parameterType="hashMap">
+		SELECT 
+			TRUNCATE(AVG(TIMESTAMPDIFF(HOUR, a.date_s, a.date_e)),0) as_time
+		FROM
+			tb_as a, tb_cmpn b
+		WHERE
+			a.is_delete ='N' AND b.is_delete ='N'
+			AND 
+				a.cmpn_no = b.cmpn_no
+			AND
+				b.head_cmpn_no = #{cmpn_no}
+			AND
+				a.status = '6'
+			AND
+				MONTH(a.cdate) = MONTH(NOW())-1
+			AND
+				MONTH(a.edate) = MONTH(NOW())-1
+  	</select>
+</mapper>
